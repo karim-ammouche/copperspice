@@ -224,7 +224,7 @@ if (NOT ${JPEG_FOUND})
    )
 endif()
 
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm")
+if(CMAKE_SYSTEM_PROCESSOR MATCHES arm|aarch64)
    target_sources(CsGui
       PRIVATE
       ${CMAKE_CURRENT_SOURCE_DIR}/image/qimage_neon.cpp
