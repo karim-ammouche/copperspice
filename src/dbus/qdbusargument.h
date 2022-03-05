@@ -367,7 +367,7 @@ inline QDBusArgument &operator<<(QDBusArgument &arg, const QVariantHash &map)
 
 QT_END_NAMESPACE
 
-Q_DECLARE_METATYPE(QDBusArgument)
+CS_DECLARE_METATYPE(QDBusArgument)
 
 #endif // QT_NO_DBUS
 #endif

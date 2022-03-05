@@ -66,8 +66,8 @@ protected:
 
 QT_END_NAMESPACE
 
-Q_DECLARE_METATYPE(QDBusUnixFileDescriptor)
-Q_DECLARE_METATYPE(QList<QDBusUnixFileDescriptor>)
+CS_DECLARE_METATYPE(QDBusUnixFileDescriptor)
+CS_DECLARE_METATYPE(QList<QDBusUnixFileDescriptor>)
 
 #endif // QT_NO_DBUS
 #endif // QDBUSUNIXFILEDESCRIPTOR_H

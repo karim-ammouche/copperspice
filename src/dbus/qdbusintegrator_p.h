@@ -126,7 +126,7 @@ public:
 
 QT_END_NAMESPACE
 
-Q_DECLARE_METATYPE(QDBusSlotCache)
+CS_DECLARE_METATYPE(QDBusSlotCache)
 
 #endif // QT_NO_DBUS
 #endif
