@@ -59,8 +59,8 @@ endif()
 # required library
 set(BUILD_COMPONENTS "Core")
 
-# unused at this time: DBus, Declarative, and ScriptTools
-set(CS_OPTIONAL_COMPONENTS Gui Multimedia Network OpenGL Script Sql Svg WebKit Xml XmlPatterns)
+# unused at this time: Declarative, and ScriptTools
+set(CS_OPTIONAL_COMPONENTS DBus Gui Multimedia Network OpenGL Script Sql Svg WebKit Xml XmlPatterns)
 
 set(PACKAGE           "copperspice")
 set(PACKAGE_NAME      "CopperSpice")
@@ -401,6 +401,16 @@ if (CMAKE_SYSTEM_NAME MATCHES "(Linux|OpenBSD|FreeBSD|NetBSD|DragonFly)")
       URL "http://www.gnu.org/software/libiconv/"
       TYPE REQUIRED
    )
+
+   if (WITH_DBUS)
+      find_package(DBus1)
+      set_package_properties(DBus1 PROPERTIES
+         PURPOSE "Required for DBUS support"
+         DESCRIPTION "Open source message bus system library"
+         URL "http://dbus.freedesktop.org"
+         TYPE REQUIRED
+      )
+   endif()
 
    if (WITH_GUI)
       find_package(X11 COMPONENTS ICE SM Xcursor Xext Xfixes Xi Xinerama Xrandr Xrender)
