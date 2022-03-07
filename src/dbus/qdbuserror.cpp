@@ -202,7 +202,7 @@ QDBusError::QDBusError(const QDBusMessage &qdmsg)
 QDBusError::QDBusError(ErrorType error, const QString &mess)
     : code(error)
 {
-    nm = QLatin1String(::get(error));
+    nm = QString::fromLatin1(::get(error));
     msg = mess;
 }
 
@@ -278,7 +278,7 @@ bool QDBusError::isValid() const
 */
 QString QDBusError::errorString(ErrorType error)
 {
-    return QLatin1String(::get(error));
+    return QString::fromLatin1(::get(error));
 }
 
 QDebug operator<<(QDebug dbg, const QDBusError &msg)

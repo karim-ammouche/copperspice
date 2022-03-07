@@ -35,13 +35,12 @@
 
 QT_BEGIN_NAMESPACE
 
-class Q_DBUS_EXPORT QDBusObjectPath
+class Q_DBUS_EXPORT QDBusObjectPath : public QString
 {
 public:
     inline QDBusObjectPath() { }
 
     inline explicit QDBusObjectPath(const char *path);
-    inline explicit QDBusObjectPath(const QLatin1String &path);
     inline explicit QDBusObjectPath(const QString &path);
     inline QDBusObjectPath &operator=(const QDBusObjectPath &path);
 
@@ -56,10 +55,6 @@ private:
 
 inline QDBusObjectPath::QDBusObjectPath(const char *objectPath)
     : QString(QString::fromLatin1(objectPath))
-{ check(); }
-
-inline QDBusObjectPath::QDBusObjectPath(const QLatin1String &objectPath)
-    : QString(objectPath)
 { check(); }
 
 inline QDBusObjectPath::QDBusObjectPath(const QString &objectPath)
@@ -85,13 +80,12 @@ inline uint qHash(const QDBusObjectPath &objectPath, uint seed)
 { return qHash(objectPath.path(), seed); }
 
 
-class Q_DBUS_EXPORT QDBusSignature : private QString
+class Q_DBUS_EXPORT QDBusSignature : public QString
 {
 public:
     inline QDBusSignature() { }
 
     inline explicit QDBusSignature(const char *signature);
-    inline explicit QDBusSignature(const QLatin1String &signature);
     inline explicit QDBusSignature(const QString &signature);
     inline QDBusSignature &operator=(const QDBusSignature &signature);
 
@@ -106,10 +100,6 @@ private:
 
 inline QDBusSignature::QDBusSignature(const char *dBusSignature)
     : QString(QString::fromLatin1(dBusSignature))
-{ check(); }
-
-inline QDBusSignature::QDBusSignature(const QLatin1String &dBusSignature)
-    : QString(dBusSignature)
 { check(); }
 
 inline QDBusSignature::QDBusSignature(const QString &dBusSignature)

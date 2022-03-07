@@ -72,7 +72,7 @@ namespace QDBusUtil
             return false;
         }
         if (isValidInterfaceName(name)) return true;
-        *error = QDBusError(QDBusError::InvalidInterface, QString::fromLatin1("Invalid interface class: %1").arg(name));
+        *error = QDBusError(QDBusError::InvalidInterface, QString::fromLatin1("Invalid interface class: %1").formatArg(name));
         return false;
     }
 
@@ -84,7 +84,7 @@ namespace QDBusUtil
             return false;
         }
         if (isValidBusName(name)) return true;
-        *error = QDBusError(QDBusError::InvalidService, QString::fromLatin1("Invalid service name: %1").arg(name));
+        *error = QDBusError(QDBusError::InvalidService, QString::fromLatin1("Invalid service name: %1").formatArg(name));
         return false;
     }
 
@@ -96,7 +96,7 @@ namespace QDBusUtil
             return false;
         }
         if (isValidObjectPath(path)) return true;
-        *error = QDBusError(QDBusError::InvalidObjectPath, QString::fromLatin1("Invalid object path: %1").arg(path));
+        *error = QDBusError(QDBusError::InvalidObjectPath, QString::fromLatin1("Invalid object path: %1").formatArg(path));
         return false;
     }
 
@@ -105,12 +105,13 @@ namespace QDBusUtil
         if (!nameType) nameType = "member";
         if (name.isEmpty()) {
             if (empty == EmptyAllowed) return true;
-            *error = QDBusError(QDBusError::InvalidMember, QLatin1String(nameType) + QLatin1String(" name cannot be empty"));
+            *error = QDBusError(QDBusError::InvalidMember,
+                    QString::fromLatin1("%1 name cannot be empty").formatArg(name));
             return false;
         }
         if (isValidMemberName(name)) return true;
         *error = QDBusError(QDBusError::InvalidMember, QString::fromLatin1("Invalid %1 name: %2")
-                            .arg(QString::fromLatin1(nameType), name));
+                            .formatArgs(QString::fromLatin1(nameType), name));
         return false;
     }
 
@@ -122,7 +123,7 @@ namespace QDBusUtil
             return false;
         }
         if (isValidErrorName(name)) return true;
-        *error = QDBusError(QDBusError::InvalidInterface, QString::fromLatin1("Invalid error name: %1").arg(name));
+        *error = QDBusError(QDBusError::InvalidInterface, QString::fromLatin1("Invalid error name: %1").formatArg(name));
         return false;
     }
 }
