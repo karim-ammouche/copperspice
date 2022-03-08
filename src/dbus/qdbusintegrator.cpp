@@ -2075,8 +2075,8 @@ bool QDBusConnectionPrivate::connectSignal(const QString &service,
         return false;           // don't connect
 
     // avoid duplicating:
-    QDBusConnectionPrivate::SignalHookHash::ConstIterator it = signalHooks.find(key);
-    QDBusConnectionPrivate::SignalHookHash::ConstIterator end = signalHooks.constEnd();
+    auto it = signalHooks.find(key);
+    auto end = signalHooks.constEnd();
     for ( ; it != end && it.key() == key; ++it) {
         const QDBusConnectionPrivate::SignalHook &entry = it.value();
         if (entry.service == hook.service &&
@@ -2149,8 +2149,8 @@ bool QDBusConnectionPrivate::disconnectSignal(const QString &service,
         return false;           // don't disconnect
 
     // avoid duplicating:
-    QDBusConnectionPrivate::SignalHookHash::Iterator it = signalHooks.find(key);
-    QDBusConnectionPrivate::SignalHookHash::Iterator end = signalHooks.end();
+    auto it = signalHooks.find(key);
+    auto end = signalHooks.end();
     for ( ; it != end && it.key() == key; ++it) {
         const QDBusConnectionPrivate::SignalHook &entry = it.value();
         if (entry.service == hook.service &&
@@ -2270,8 +2270,8 @@ void QDBusConnectionPrivate::connectRelay(const QString &service,
 
     // add it to our list:
     QDBusWriteLocker locker(ConnectRelayAction, this);
-    SignalHookHash::ConstIterator it = signalHooks.find(key);
-    SignalHookHash::ConstIterator end = signalHooks.constEnd();
+    auto it = signalHooks.find(key);
+    auto end = signalHooks.constEnd();
     for ( ; it != end && it.key() == key; ++it) {
         const SignalHook &entry = it.value();
         if (entry.service == hook.service &&
@@ -2301,8 +2301,8 @@ void QDBusConnectionPrivate::disconnectRelay(const QString &service,
 
     // remove it from our list:
     QDBusWriteLocker locker(DisconnectRelayAction, this);
-    SignalHookHash::Iterator it = signalHooks.find(key);
-    SignalHookHash::Iterator end = signalHooks.end();
+    auto it = signalHooks.find(key);
+    auto end = signalHooks.end();
     for ( ; it != end && it.key() == key; ++it) {
         const SignalHook &entry = it.value();
         if (entry.service == hook.service &&
@@ -2329,7 +2329,7 @@ QString QDBusConnectionPrivate::getNameOwner(const QString& serviceName)
     {
         // acquire a read lock for the cache
         QReadLocker locker(&lock);
-        WatchedServicesHash::ConstIterator it = watchedServices.constFind(serviceName);
+        auto it = watchedServices.constFind(serviceName);
         if (it != watchedServices.constEnd())
             return it->owner;
     }

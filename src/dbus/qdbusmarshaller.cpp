@@ -199,8 +199,8 @@ inline void QDBusMarshaller::append(const QStringList &arg)
 
     QDBusMarshaller sub(capabilities);
     open(sub, DBUS_TYPE_ARRAY, DBUS_TYPE_STRING_AS_STRING);
-    QStringList::ConstIterator it = arg.constBegin();
-    QStringList::ConstIterator end = arg.constEnd();
+    auto it = arg.constBegin();
+    auto end = arg.constEnd();
     for ( ; it != end; ++it)
         sub.append(*it);
     // don't call sub.close(): it auto-closes

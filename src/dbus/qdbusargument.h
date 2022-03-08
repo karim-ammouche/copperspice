@@ -231,8 +231,8 @@ inline QDBusArgument &operator<<(QDBusArgument &arg, const QList<T> &list)
 {
     uint id = QVariant::typeToTypeId<T>();
     arg.beginArray(id);
-    typename QList<T>::ConstIterator it = list.constBegin();
-    typename QList<T>::ConstIterator end = list.constEnd();
+    auto it = list.constBegin();
+    auto end = list.constEnd();
     for ( ; it != end; ++it)
         arg << *it;
     arg.endArray();
@@ -258,8 +258,8 @@ inline QDBusArgument &operator<<(QDBusArgument &arg, const QVariantList &list)
 {
     uint id = QVariant::typeToTypeId<QDBusVariant>();
     arg.beginArray(id);
-    QVariantList::ConstIterator it = list.constBegin();
-    QVariantList::ConstIterator end = list.constEnd();
+    auto it = list.constBegin();
+    auto end = list.constEnd();
     for ( ; it != end; ++it)
         arg << QDBusVariant(*it);
     arg.endArray();
@@ -304,8 +304,8 @@ inline const QDBusArgument &operator>>(const QDBusArgument &arg, QMap<Key, T> &m
 inline QDBusArgument &operator<<(QDBusArgument &arg, const QVariantMap &map)
 {
     arg.beginMap(QVariant::String, QVariant::typeToTypeId<QDBusVariant>());
-    QVariantMap::ConstIterator it = map.constBegin();
-    QVariantMap::ConstIterator end = map.constEnd();
+    auto it = map.constBegin();
+    auto end = map.constEnd();
     for ( ; it != end; ++it) {
         arg.beginMapEntry();
         arg << it.key() << QDBusVariant(it.value());
@@ -353,8 +353,8 @@ inline const QDBusArgument &operator>>(const QDBusArgument &arg, QHash<Key, T> &
 inline QDBusArgument &operator<<(QDBusArgument &arg, const QVariantHash &map)
 {
     arg.beginMap(QVariant::String, QVariant::typeToTypeId<QDBusVariant>());
-    QVariantHash::ConstIterator it = map.constBegin();
-    QVariantHash::ConstIterator end = map.constEnd();
+    auto it = map.constBegin();
+    auto end = map.constEnd();
     for ( ; it != end; ++it) {
         arg.beginMapEntry();
         arg << it.key() << QDBusVariant(it.value());

@@ -88,8 +88,8 @@ static QString generateSubObjectXml(QObject *object)
 {
     QString retval;
     const QObjectList &objs = object->children();
-    QObjectList::ConstIterator it = objs.constBegin();
-    QObjectList::ConstIterator end = objs.constEnd();
+    auto it = objs.constBegin();
+    auto end = objs.constEnd();
     for ( ; it != end; ++it) {
         QString name = (*it)->objectName();
         if (!name.isEmpty() && QDBusUtil::isValidPartOfObjectPath(name))
