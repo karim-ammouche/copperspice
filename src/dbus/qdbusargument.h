@@ -294,7 +294,7 @@ inline const QDBusArgument &operator>>(const QDBusArgument &arg, QMap<Key, T> &m
         T value;
         arg.beginMapEntry();
         arg >> key >> value;
-        map.insertMulti(key, value);
+        map.insert(key, value);
         arg.endMapEntry();
     }
     arg.endMap();
@@ -343,7 +343,7 @@ inline const QDBusArgument &operator>>(const QDBusArgument &arg, QHash<Key, T> &
         T value;
         arg.beginMapEntry();
         arg >> key >> value;
-        map.insertMulti(key, value);
+        map.insert(key, value);
         arg.endMapEntry();
     }
     arg.endMap();
