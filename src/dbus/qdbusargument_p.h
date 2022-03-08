@@ -145,7 +145,7 @@ public:
     int toInt();
     uint toUInt();
     qint64 toLongLong();
-    quint64toULongLong();
+    quint64 toULongLong();
     double toDouble();
     QString toString();
     QDBusObjectPath toObjectPath();
