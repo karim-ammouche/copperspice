@@ -24,7 +24,6 @@
 #ifndef QDBUSMETATYPE_H
 #define QDBUSMETATYPE_H
 
-#include "QtCore/qmetatype.h"
 #include <QtDBus/qdbusargument.h>
 
 #ifndef QT_NO_DBUS
@@ -60,7 +59,7 @@ int qDBusRegisterMetaType(T * /* dummy */ = 0
     void (*mf)(QDBusArgument &, const T *) = qDBusMarshallHelper<T>;
     void (*df)(const QDBusArgument &, T *) = qDBusDemarshallHelper<T>;
 
-    int id = qRegisterMetaType<T>(); // make sure it's registered
+    uint id = QVariant::typeToTypeId<T>();
     QDBusMetaType::registerMarshallOperators(id,
         reinterpret_cast<QDBusMetaType::MarshallFunction>(mf),
         reinterpret_cast<QDBusMetaType::DemarshallFunction>(df));

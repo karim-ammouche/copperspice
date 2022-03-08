@@ -154,7 +154,7 @@ inline bool QDBusMarshaller::append(const QDBusVariant &arg)
     }
 
     const QVariant &value = arg.variant();
-    int id = value.userType();
+    uint id = value.userType();
     if (id == QVariant::Invalid) {
         qWarning("QDBusMarshaller: cannot add a null QDBusVariant");
         error(QLatin1String("Variant containing QVariant::Invalid passed in arguments"));
@@ -166,18 +166,19 @@ inline bool QDBusMarshaller::append(const QDBusVariant &arg)
     if (id == QDBusMetaTypeId::argument) {
         // take the signature from the QDBusArgument object we're marshalling
         tmpSignature =
-            qvariant_cast<QDBusArgument>(value).currentSignature().toLatin1();
+            value.value<QDBusArgument>().currentSignature().toLatin1();
         signature = tmpSignature.constData();
     } else {
         // take the signatuer from the metatype we're marshalling
         signature = QDBusMetaType::typeToSignature(id);
     }
     if (!signature) {
+        QString typeName = QVariant::typeToName(id);
         qWarning("QDBusMarshaller: type `%s' (%d) is not registered with D-BUS. "
                  "Use qDBusRegisterMetaType to register it",
-                 QMetaType::typeName(id), id);
+                 qPrintable(typeName), id);
         error(QString::fromLatin1("Unregistered type %1 passed in arguments")
-              .formatArg(QLatin1String(QMetaType::typeName(id))));
+              .formatArg(typeName));
         return false;
     }
 
@@ -214,11 +215,12 @@ inline QDBusMarshaller *QDBusMarshaller::beginArray(int id)
 {
     const char *signature = QDBusMetaType::typeToSignature( QVariant::Type(id) );
     if (!signature) {
+        QString typeName = QVariant::typeToName(QVariant::Type(id));
         qWarning("QDBusMarshaller: type `%s' (%d) is not registered with D-BUS. "
                  "Use qDBusRegisterMetaType to register it",
-                 QVariant::typeToName( QVariant::Type(id) ), id);
+                 qPrintable(typeName), id);
         error(QString::fromLatin1("Unregistered type %1 passed in arguments")
-              .formatArg(QLatin1String(QVariant::typeToName(QVariant::Type(id)))));
+              .formatArg(typeName));
         return this;
     }
 
@@ -229,18 +231,20 @@ inline QDBusMarshaller *QDBusMarshaller::beginMap(int kid, int vid)
 {
     const char *ksignature = QDBusMetaType::typeToSignature( QVariant::Type(kid) );
     if (!ksignature) {
+        QString typeName = QVariant::typeToName(QVariant::Type(kid));
         qWarning("QDBusMarshaller: type `%s' (%d) is not registered with D-BUS. "
                  "Use qDBusRegisterMetaType to register it",
-                 QVariant::typeToName( QVariant::Type(kid) ), kid);
+                 typeName, kid);
         error(QString::fromLatin1("Unregistered type %1 passed in arguments")
-              .formatArg(QLatin1String(QVariant::typeToName(QVariant::Type(kid)))));
+              .formatArg(typeName));
         return this;
     }
     if (ksignature[1] != 0 || !QDBusUtil::isValidBasicType(*ksignature)) {
+        QString typeName = QVariant::typeToName(QVariant::Type(kid));
         qWarning("QDBusMarshaller: type '%s' (%d) cannot be used as the key type in a D-BUS map.",
-                 QVariant::typeToName( QVariant::Type(kid) ), kid);
+                 qPrintable(typeName), kid);
         error(QString::fromLatin1("Type %1 passed in arguments cannot be used as a key in a map")
-              .formatArg(QLatin1String(QVariant::typeToName(QVariant::Type(kid)))));
+              .formatArg(typeName));
         return this;
     }
 
@@ -351,7 +355,7 @@ bool QDBusMarshaller::appendVariantInternal(const QVariant &arg)
 
     // intercept QDBusArgument parameters here
     if (id == QDBusMetaTypeId::argument) {
-        QDBusArgument dbusargument = qvariant_cast<QDBusArgument>(arg);
+        QDBusArgument dbusargument = arg.value<QDBusArgument>();
         QDBusArgumentPrivate *d = QDBusArgumentPrivate::d(dbusargument);
         if (!d->message)
             return false;       // can't append this one...
@@ -382,32 +386,17 @@ bool QDBusMarshaller::appendVariantInternal(const QVariant &arg)
     }
 
     switch (*signature) {
-#ifdef __OPTIMIZE__
     case DBUS_TYPE_BYTE:
-    case DBUS_TYPE_INT16:
-    case DBUS_TYPE_UINT16:
-    case DBUS_TYPE_INT32:
-    case DBUS_TYPE_UINT32:
-    case DBUS_TYPE_INT64:
-    case DBUS_TYPE_UINT64:
-    case DBUS_TYPE_DOUBLE:
-        qIterAppend(&iterator, ba, *signature, arg.constData());
-        return true;
-    case DBUS_TYPE_BOOLEAN:
-        append( arg.toBool() );
-        return true;
-#else
-    case DBUS_TYPE_BYTE:
-        append( qvariant_cast<uchar>(arg) );
+        append( arg.value<uchar>() );
         return true;
     case DBUS_TYPE_BOOLEAN:
         append( arg.toBool() );
         return true;
     case DBUS_TYPE_INT16:
-        append( qvariant_cast<short>(arg) );
+        append( arg.value<short>() );
         return true;
     case DBUS_TYPE_UINT16:
-        append( qvariant_cast<ushort>(arg) );
+        append( arg.value<ushort>() );
         return true;
     case DBUS_TYPE_INT32:
         append( static_cast<dbus_int32_t>(arg.toInt()) );
@@ -424,22 +413,21 @@ bool QDBusMarshaller::appendVariantInternal(const QVariant &arg)
     case DBUS_TYPE_DOUBLE:
         append( arg.toDouble() );
         return true;
-#endif
 
     case DBUS_TYPE_STRING:
         append( arg.toString() );
         return true;
     case DBUS_TYPE_OBJECT_PATH:
-        append( qvariant_cast<QDBusObjectPath>(arg) );
+        append( arg.value<QDBusObjectPath>() );
         return true;
     case DBUS_TYPE_SIGNATURE:
-        append( qvariant_cast<QDBusSignature>(arg) );
+        append( arg.value<QDBusSignature>() );
         return true;
 
     // compound types:
     case DBUS_TYPE_VARIANT:
         // nested QVariant
-        return append( qvariant_cast<QDBusVariant>(arg) );
+        return append( arg.value<QDBusVariant>() );
 
     case DBUS_TYPE_ARRAY:
         // could be many things
@@ -469,7 +457,7 @@ bool QDBusMarshaller::appendVariantInternal(const QVariant &arg)
 
     case DBUS_TYPE_UNIX_FD:
         if (capabilities & QDBusConnection::UnixFileDescriptorPassing || ba) {
-            append(qvariant_cast<QDBusUnixFileDescriptor>(arg));
+            append(arg.value<QDBusUnixFileDescriptor>());
             return true;
         }
         // fall through

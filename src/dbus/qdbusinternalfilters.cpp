@@ -333,7 +333,7 @@ static int writeProperty(QObject *obj, const QByteArray &property_name, QVariant
         // we have to demarshall before writing
         void *null = 0;
         QVariant other(id, null);
-        if (!QDBusMetaType::demarshall(qvariant_cast<QDBusArgument>(value), id, other.data())) {
+        if (!QDBusMetaType::demarshall(value.value<QDBusArgument>(), id, other.data())) {
             qWarning("QDBusConnection: type `%s' (%d) is not registered with QtDBus. "
                      "Use qDBusRegisterMetaType to register it",
                      mp.typeName(), id);
@@ -357,7 +357,7 @@ QDBusMessage qDBusPropertySet(const QDBusConnectionPrivate::ObjectTreeNode &node
 
     QString interface_name = msg.arguments().at(0).toString();
     QByteArray property_name = msg.arguments().at(1).toString().toUtf8();
-    QVariant value = qvariant_cast<QDBusVariant>(msg.arguments().at(2)).variant();
+    QVariant value = msg.arguments().at(2).value<QDBusVariant>().variant();
 
     QDBusAdaptorConnector *connector;
     if (node.flags & QDBusConnection::ExportAdaptors &&

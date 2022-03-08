@@ -62,10 +62,10 @@ namespace QDBusPendingReplyTypes {
     };
 
     template<typename T1> inline int metaTypeFor(T1 * = 0)
-    { return qMetaTypeId<T1>(); }
+    { return QVariant::typeToTypeId<T1>(); }
     // specialize for QVariant, allowing it to be used in place of QDBusVariant
     template<> inline int metaTypeFor<QVariant>(QVariant *)
-    { return qMetaTypeId<QDBusVariant>(); }
+    { return QVariant::typeToTypeId<QDBusVariant>(); }
 
     template<typename T1, typename T2, typename T3, typename T4,
              typename T5, typename T6, typename T7, typename T8>

@@ -732,7 +732,7 @@ QDBusCallDeliveryEvent* QDBusConnectionPrivate::prepareReply(QDBusConnectionPriv
     // check that types match
     for (int i = 0; i < n; ++i)
         if (metaTypes.at(i + 1) != msg.arguments().at(i).userType() &&
-            msg.arguments().at(i).userType() != qMetaTypeId<QDBusArgument>())
+            msg.arguments().at(i).userType() != QVariant::typeToTypeId<QDBusArgument>())
             return 0;           // no match
 
     // we can deliver
@@ -796,7 +796,7 @@ bool QDBusConnectionPrivate::activateCall(QObject* object, int flags, const QDBu
                "function called for an object that is in another thread!!");
 
     QDBusSlotCache slotCache =
-        qvariant_cast<QDBusSlotCache>(object->property(cachePropertyName));
+        object->property(cachePropertyName).value<QDBusSlotCache>();
     QString cacheKey = msg.member(), signature = msg.signature();
     if (!signature.isEmpty()) {
         cacheKey.reserve(cacheKey.length() + 1 + signature.length());
@@ -881,7 +881,7 @@ void QDBusConnectionPrivate::deliverCall(QObject *object, int /*flags*/, const Q
         if (arg.userType() == id)
             // no conversion needed
             params.append(const_cast<void *>(arg.constData()));
-        else if (arg.userType() == qMetaTypeId<QDBusArgument>()) {
+        else if (arg.userType() == QVariant::typeToTypeId<QDBusArgument>()) {
             // convert to what the function expects
             void *null = 0;
             auxParameters.append(QVariant(id, null));

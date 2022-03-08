@@ -187,7 +187,7 @@ void qDBusReplyFill(const QDBusMessage &reply, QDBusError &error, QVariant &data
     if (reply.arguments().count() >= 1) {
         if (reply.arguments().at(0).userType() == QDBusMetaTypeId::argument) {
             // compare signatures instead
-            QDBusArgument arg = qvariant_cast<QDBusArgument>(reply.arguments().at(0));
+            QDBusArgument arg = reply.arguments().at(0).value<QDBusArgument>();
             receivedSignature = arg.currentSignature().toLatin1();
             if (receivedSignature == expectedSignature) {
                 // matched. Demarshall it

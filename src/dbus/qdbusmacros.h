@@ -25,7 +25,6 @@
 #define QDBUSMACROS_H
 
 #include <QtCore/qglobal.h>
-#include <QtCore/qmetatype.h>
 #include <QtCore/qvariant.h>
 
 #define Q_NOREPLY

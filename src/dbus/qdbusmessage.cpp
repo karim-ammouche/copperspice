@@ -248,7 +248,7 @@ QDBusMessage QDBusMessagePrivate::makeLocal(const QDBusConnectionPrivate &conn,
         int id = it->userType();
         const char *signature = QDBusMetaType::typeToSignature(id);
         if ((id != QVariant::StringList && id != QVariant::ByteArray &&
-             qstrlen(signature) != 1) || id == qMetaTypeId<QDBusVariant>()) {
+             qstrlen(signature) != 1) || id == QVariant::typeToTypeId<QDBusVariant>()) {
             // yes, we are
             // we must marshall and demarshall again so as to create QDBusArgument
             // entries for the complex types

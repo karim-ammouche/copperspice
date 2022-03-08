@@ -144,7 +144,7 @@ void QDBusAbstractInterfacePrivate::property(const QMetaProperty &mp, QVariant &
 
     QByteArray foundSignature;
     const char *foundType = 0;
-    QVariant value = qvariant_cast<QDBusVariant>(reply.arguments().at(0)).variant();
+    QVariant value = reply.arguments().at(0).value<QDBusVariant>().variant();
 
     if (value.userType() == where.userType() || mp.type() == 0xff
         || (expectedSignature[0] == 'v' && expectedSignature[1] == '\0')) {
@@ -153,8 +153,8 @@ void QDBusAbstractInterfacePrivate::property(const QMetaProperty &mp, QVariant &
         return;
     }
 
-    if (value.userType() == qMetaTypeId<QDBusArgument>()) {
-        QDBusArgument arg = qvariant_cast<QDBusArgument>(value);
+    if (value.userType() == QVariant::typeToTypeId<QDBusArgument>()) {
+        QDBusArgument arg = value.value<QDBusArgument>();
 
         foundType = "user type";
         foundSignature = arg.currentSignature().toLatin1();

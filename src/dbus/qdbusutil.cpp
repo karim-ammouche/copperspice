@@ -103,28 +103,28 @@ static bool variantToString(const QVariant &arg, QString &out)
         out += QString::number(arg.toDouble());
     } else if (argType == QMetaType::Bool) {
         out += QLatin1String(arg.toBool() ? "true" : "false");
-    } else if (argType == qMetaTypeId<QDBusArgument>()) {
-        argToString(qvariant_cast<QDBusArgument>(arg), out);
-    } else if (argType == qMetaTypeId<QDBusObjectPath>()) {
-        const QString path = qvariant_cast<QDBusObjectPath>(arg).path();
+    } else if (argType == QVariant::typeToTypeId<QDBusArgument>()) {
+        argToString(arg.value<QDBusArgument>(), out);
+    } else if (argType == QVariant::typeToTypeId<QDBusObjectPath>()) {
+        const QString path = arg.value<QDBusObjectPath>().path();
         out += QLatin1String("[ObjectPath: ");
         out += path;
         out += QLatin1Char(']');
-    } else if (argType == qMetaTypeId<QDBusSignature>()) {
-        out += QLatin1String("[Signature: ") + qvariant_cast<QDBusSignature>(arg).signature();
+    } else if (argType == QVariant::typeToTypeId<QDBusSignature>()) {
+        out += QLatin1String("[Signature: ") + arg.value<QDBusSignature>().signature();
         out += QLatin1Char(']');
-    } else if (argType == qMetaTypeId<QDBusUnixFileDescriptor>()) {
+    } else if (argType == QVariant::typeToTypeId<QDBusUnixFileDescriptor>()) {
         out += QLatin1String("[Unix FD: ");
-        out += QLatin1String(qvariant_cast<QDBusUnixFileDescriptor>(arg).isValid() ? "valid" : "not valid");
+        out += QLatin1String(arg.value<QDBusUnixFileDescriptor>().isValid() ? "valid" : "not valid");
         out += QLatin1Char(']');
-    } else if (argType == qMetaTypeId<QDBusVariant>()) {
-        const QVariant v = qvariant_cast<QDBusVariant>(arg).variant();
+    } else if (argType == QVariant::typeToTypeId<QDBusVariant>()) {
+        const QVariant v = arg.value<QDBusVariant>().variant();
         out += QLatin1String("[Variant");
         int vUserType = v.userType();
-        if (vUserType != qMetaTypeId<QDBusVariant>()
-                && vUserType != qMetaTypeId<QDBusSignature>()
-                && vUserType != qMetaTypeId<QDBusObjectPath>()
-                && vUserType != qMetaTypeId<QDBusArgument>())
+        if (vUserType != QVariant::typeToTypeId<QDBusVariant>()
+                && vUserType != QVariant::typeToTypeId<QDBusSignature>()
+                && vUserType != QVariant::typeToTypeId<QDBusObjectPath>()
+                && vUserType != QVariant::typeToTypeId<QDBusArgument>())
             out += QLatin1Char('(') + QLatin1String(v.typeName()) + QLatin1Char(')');
         out += QLatin1String(": ");
         if (!variantToString(v, out))
