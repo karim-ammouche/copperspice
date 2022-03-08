@@ -316,11 +316,11 @@ int QMetaObject::indexOfProperty(const QString &name) const
 {
    int retval = -1;
 
-   for (int x = 0; x < this->propertyCount(); ++x) {
-      QMetaProperty testProperty = this->property(x);
+   for (int index = 0; index < this->propertyCount(); ++index) {
+      QMetaProperty tmpProperty = this->property(index);
 
-      if (testProperty.name() == name)  {
-         retval = x;
+      if (tmpProperty.name() == name)  {
+         retval = index;
          break;
       }
    }
@@ -1468,16 +1468,15 @@ int QMetaObject::enum_calculate(QString enumData, QMap<QString, int> valueMap)
          QString className = word.mid(0, pos);
          QString enumKey   = word.mid(pos + 2);
 
-         for (auto index = m_enumsAll().begin(); index != m_enumsAll().end(); ++index  )  {
+         //
+         auto &enumMap = m_enumsAll();
 
-            QMetaObject *obj = index.value().first;
+         for (auto [metaObject, enumName] : enumMap)  {
 
-            if ( obj->className() == className )  {
-               QString enumName = index.value().second;
-
+            if (metaObject->className() == className)  {
                // obtain the enum object
-               int x = obj->indexOfEnumerator(enumName);
-               QMetaEnum enumObj = obj->enumerator(x);
+               int index = metaObject->indexOfEnumerator(enumName);
+               QMetaEnum enumObj = metaObject->enumerator(index);
 
                int answer = enumObj.keyToValue(enumKey);
 
@@ -1517,7 +1516,7 @@ int QMetaObject::enum_calculate(QString enumData, QMap<QString, int> valueMap)
       // B
       if (word  == "|")  {
          if (valueStack.size() < 2) {
-            throw std::logic_error("Unable to parse enum data, check enum macros");
+            throw std::logic_error("Unable to parse enum data, check enum macros (|)");
          }
 
          int right = valueStack.takeLast();
@@ -1527,7 +1526,7 @@ int QMetaObject::enum_calculate(QString enumData, QMap<QString, int> valueMap)
 
       } else if (word  == "<<")  {
          if (valueStack.size() < 2) {
-            throw std::logic_error("Unable to parse enum data, check enum macros");
+            throw std::logic_error("Unable to parse enum data, check enum macros (<<)");
          }
 
          int right = valueStack.takeLast();
@@ -1536,7 +1535,7 @@ int QMetaObject::enum_calculate(QString enumData, QMap<QString, int> valueMap)
 
       } else if (word  == "~")  {
          if (valueStack.size() < 1) {
-            throw std::logic_error("Unable to parse enum data, check enum macros");
+            throw std::logic_error("Unable to parse enum data, check enum macros (~)");
          }
 
          int right = valueStack.takeLast();
@@ -1700,11 +1699,12 @@ QMetaProperty QMetaObject_X::property(int index) const
       return superClass()->property(index - count);
 
    }  else {
-      auto elem = m_properties.end();
+      auto iter = m_properties.end() - 1;
 
-      // decrement iterator (end() is really plus 1, sub it out)
-      elem -= index + 1;
-      return elem.value();
+      // counting from the end
+      iter -= index;
+
+      return iter.value();
    }
 }
 
@@ -1747,7 +1747,7 @@ int QMetaObject_X::register_flag(const QString &enumName, const QString &scope, 
    m_enums.insert(flagName, data);
 
    // used in findEnum()
-   m_enumsAll().insert(id, std::make_pair(this, flagName) );
+   m_enumsAll().insert(id, std::make_pair(this, flagName));
 
    return 0;
 }
@@ -1830,7 +1830,7 @@ void QMetaObject_X::register_enum_data(const QString &args)
 
          QString key = word;
          valueMap.insert(key, value);
-         value++;
+         ++value;
 
          if (letter == '}') {
             break;
@@ -1847,35 +1847,32 @@ void QMetaObject_X::register_enum_data(const QString &args)
    }
 
 
-   // 3 look up enumName to test, is a flag?
-   std::vector<QString> tempName(0);
+   // 3 look up enumName to test if it has a flag
+   std::vector<QString> tmpName;
+   tmpName.push_back(enumName);
 
    auto iter_flag = m_flag.find(enumName);
 
-   if (iter_flag == m_flag.end()) {
-      // save the enumName in the QVector
-      tempName.push_back(enumName);
-
-   } else {
-      while (iter_flag != m_flag.end() && iter_flag.key() == enumName) {
-         tempName.push_back(iter_flag.value());
-         ++iter_flag;
-      }
+   while (iter_flag != m_flag.end() && iter_flag.key() == enumName) {
+      // value is the name of a flag
+      tmpName.push_back(iter_flag.value());
+      ++iter_flag;
    }
 
-   // save enum data in QMap
-   for (uint i = 0; i < tempName.size(); ++i) {
-      auto iter_enum = m_enums.find(tempName.at(i));
+
+   // for each enum name, update value of 'enum value name'/'enum value' in m_enums
+   for (const auto &item : tmpName) {
+      auto iter_enum = m_enums.find(item);
 
       if (iter_enum == m_enums.end()) {
-         throw std::logic_error("Unable to register enum data, verify enum macros");
+         throw std::logic_error("Unable to register enum data, verify enum has been registered");
 
       } else  {
-         QMetaEnum enumObj = iter_enum.value();
-         enumObj.setData(valueMap);
+         // get a reference to the current QMetaEnum
+         QMetaEnum &enumObj = iter_enum.value();
 
-         // update QMetaEnum
-         m_enums.insert( tempName.at(i), enumObj);
+         // update the QMetaEnum value in m_enums
+         enumObj.setData(valueMap);
       }
    }
 }
@@ -2022,7 +2019,8 @@ void QMetaObject_X::register_tag(const QString &name, const QString &method)
 }
 
 // ** internal properties
-void QMetaObject_X::register_property_read(const QString &name, const QString &dataType, JarReadAbstract *readJar)
+void QMetaObject_X::register_property_read(const QString &name, std::type_index returnTypeId,
+         QString (*returnTypeFuncPtr)(), JarReadAbstract *readJar)
 {
    if (name.isEmpty() ) {
       return;
@@ -2034,13 +2032,13 @@ void QMetaObject_X::register_property_read(const QString &name, const QString &d
       // entry not found, construct new obj then add to container
 
       QMetaProperty data = QMetaProperty{name, this};
-      data.setReadMethod(dataType, readJar);
+      data.setReadMethod(returnTypeId, returnTypeFuncPtr, readJar);
 
       m_properties.insert(name, std::move(data));
 
    } else {
       // update QMetaProperty in the container
-      iter->setReadMethod(dataType, readJar);
+      iter->setReadMethod(returnTypeId, returnTypeFuncPtr, readJar);
 
    }
 }

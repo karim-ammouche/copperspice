@@ -237,7 +237,7 @@ class Q_CORE_EXPORT QMetaProperty
    bool write(QObject *object, const QVariant &value) const;
 
    // properties
-   void setReadMethod(const QString &typeName, JarReadAbstract *jarRead);
+   void setReadMethod(std::type_index returnTypeId, QString (*returnTypeFuncPtr)(), JarReadAbstract *jarRead);
    void setWriteMethod(JarWriteAbstract *method);
 
    template<class T>
@@ -252,9 +252,14 @@ class Q_CORE_EXPORT QMetaProperty
    void setUser(JarReadAbstract *method);
 
  private:
+   void loadTypeName() const;
+
    QMetaObject *m_metaObject;
    QString m_name;
    QString m_typeName;
+
+   std::type_index m_returnTypeId;
+   QString (*m_returnTypeFuncPtr)();
 
    bool m_read_able;
    bool m_write_able;
@@ -357,9 +362,9 @@ class CS_ReturnType
 
 #endif // doxypress
 
-// methods for these 2 class, located in csmeta_internal2.h around line 117
+// methods for these 2 class, located in csmeta_internal2.h around line 113
 template<class E>
-class CS_ReturnType<E, typename std::enable_if<std::is_enum<E>::value>::type>
+class CS_ReturnType<E, typename std::enable_if<std::is_enum_v<E>>::type>
 {
  public:
    static const QString &getName();
