@@ -94,7 +94,7 @@ static QString generateSubObjectXml(QObject *object)
         QString name = (*it)->objectName();
         if (!name.isEmpty() && QDBusUtil::isValidPartOfObjectPath(name))
             retval += QString::fromLatin1("  <node name=\"%1\"/>\n")
-                      .arg(name);
+                      .formatArg(name);
     }
     return retval;
 }
@@ -170,7 +170,7 @@ QString qDBusIntrospectObject(const QDBusConnectionPrivate::ObjectTreeNode &node
         for ( ; it != end; ++it)
             if (it->obj || !it->children.isEmpty())
                 xml_data += QString::fromLatin1("  <node name=\"%1\"/>\n")
-                            .arg(it->name);
+                            .formatArg(it->name);
     }
 
     xml_data += QLatin1String("</node>\n");
@@ -183,8 +183,7 @@ static inline QDBusMessage interfaceNotFoundError(const QDBusMessage &msg, const
 {
     return msg.createErrorReply(QDBusError::UnknownInterface,
                                 QString::fromLatin1("Interface %1 was not found in object %2")
-                                .arg(interface_name)
-                                .arg(msg.path()));
+                                .formatArgs(interface_name, msg.path()));
 }
 
 static inline QDBusMessage
@@ -192,7 +191,7 @@ propertyNotFoundError(const QDBusMessage &msg, const QString &interface_name, co
 {
     return msg.createErrorReply(QDBusError::InvalidArgs,
                                 QString::fromLatin1("Property %1%2%3 was not found in object %4")
-                                .arg(interface_name,
+                                .formatArgs(interface_name,
                                      QString::fromLatin1(interface_name.isEmpty() ? "" : "."),
                                      QString::fromLatin1(property_name),
                                      msg.path()));
@@ -282,7 +281,7 @@ static QDBusMessage propertyWriteReply(const QDBusMessage &msg, const QString &i
     case PropertyTypeMismatch:
         return msg.createErrorReply(QDBusError::InvalidArgs,
                                     QString::fromLatin1("Invalid arguments for writing to property %1%2%3")
-                                    .arg(interface_name,
+                                    .formatArgs(interface_name,
                                          QString::fromLatin1(interface_name.isEmpty() ? "" : "."),
                                          QString::fromLatin1(property_name)));
     case PropertyWriteFailed:

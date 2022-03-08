@@ -438,7 +438,7 @@ const char *QDBusMetaType::typeToSignature(int type)
         const QDBusCustomTypeInfo &info = (*ct).at(type);
 
         if (!info.signature.isNull())
-            return info.signature;
+            return info.signature.constData();
 
         if (!info.marshall)
             return 0;           // type not registered with us
@@ -456,7 +456,7 @@ const char *QDBusMetaType::typeToSignature(int type)
         info = &(*ct)[type];
         info->signature = signature;
     }
-    return info->signature;
+    return info->signature.constData();
 }
 
 QT_END_NAMESPACE

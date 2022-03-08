@@ -81,7 +81,7 @@ QByteArray QDBusArgumentPrivate::createSignature(int id)
                  "(Did you forget to call beginStructure() ?)",
                  QVariant::typeToName( QVariant::Type(id) ),
                  signature.constData(),
-                 QVariant::typeToName( QVariant::Type(QDBusMetaType::signatureToType(signature))) );
+                 QVariant::typeToName( QVariant::Type(QDBusMetaType::signatureToType(signature.constData()))) );
         return "";
     }
     return signature;
